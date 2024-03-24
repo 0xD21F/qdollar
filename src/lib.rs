@@ -265,4 +265,49 @@ mod tests {
         assert_eq!(num_gestures, 0);
     }
 
+    #[test]
+    fn test_cloud_match() {
+        let points1 = vec![
+            Point::new(0.0, 0.0, 1),
+            Point::new(0.0, 1.0, 1),
+            Point::new(1.0, 1.0, 1),
+            Point::new(1.0, 0.0, 1),
+            Point::new(0.0, 0.0, 1),
+        ];
+        let points2 = vec![
+            Point::new(0.1, 0.1, 1),
+            Point::new(0.1, 0.9, 1),
+            Point::new(0.9, 0.9, 1),
+            Point::new(0.9, 0.1, 1),
+            Point::new(0.1, 0.1, 1),
+        ];
+        let template = PointCloud::new("test".to_string(), points1.clone());
+        let candidate = PointCloud::new("test".to_string(), points2.clone());
+
+        let distance = utils::cloud_match(&candidate, &template, f64::INFINITY);
+        assert!(distance < 0.1);
+    }
+
+    #[test]
+    fn test_centroid() {
+        let points = vec![
+            Point::new(0.0, 0.0, 1),
+            Point::new(0.0, 1.0, 1),
+            Point::new(1.0, 1.0, 1),
+            Point::new(1.0, 0.0, 1),
+        ];
+
+        let centroid = utils::centroid(&points);
+        assert!((centroid.x - 0.5).abs() < 1e-6);
+        assert!((centroid.y - 0.5).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_euclidean_distance() {
+        let point1 = Point::new(0.0, 0.0, 1);
+        let point2 = Point::new(3.0, 4.0, 1);
+
+        let distance = utils::euclidean_distance(&point1, &point2);
+        assert!((distance - 5.0).abs() < 1e-6);
+    }
 }
