@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use crate::{utils, Point, PointCloud};
 use crate::error::QDollarError;
 
@@ -9,7 +11,7 @@ pub struct QDollarRecognizer {
 pub struct QDollarResult {
     pub name: String,
     pub score: f64,
-    pub time: u128,
+    pub time: Duration,
 }
 
 impl QDollarRecognizer {
@@ -48,7 +50,7 @@ impl QDollarRecognizer {
         Ok(QDollarResult {
             name: self.point_clouds[best_template].name.clone(),
             score,
-            time: now.elapsed().as_millis(),
+            time: now.elapsed(),
         })
     }
 
