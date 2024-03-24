@@ -242,4 +242,27 @@ mod tests {
 
         Page::single(&view).save(filename).map_err(|e| e.into())
     }
+
+    #[test]
+    fn test_add_and_delete_gesture() {
+        let mut recognizer = QDollarRecognizer::new();
+
+        let circle_points = vec![
+            Point::new(0.0, 0.0, 1),
+            Point::new(0.0, 1.0, 1),
+            Point::new(1.0, 1.0, 1),
+            Point::new(1.0, 0.0, 1),
+            Point::new(0.0, 0.0, 1),
+        ];
+        let num_gestures = recognizer.add_gesture("circle".to_string(), circle_points.clone());
+        assert_eq!(num_gestures, 1);
+
+        let result = recognizer.recognize(&circle_points);
+        assert_eq!(result.name, "circle");
+        assert!(result.score > 0.9);
+
+        let num_gestures = recognizer.delete_user_gestures();
+        assert_eq!(num_gestures, 0);
+    }
+
 }

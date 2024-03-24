@@ -60,7 +60,7 @@ impl QDollarRecognizer {
     }
 
     pub fn delete_user_gestures(&mut self) -> usize {
-        self.point_clouds.truncate(utils::NUM_POINT_CLOUDS);
+        self.point_clouds.clear();
         self.point_clouds.len()
     }
 }

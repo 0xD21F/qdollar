@@ -1,6 +1,5 @@
 use crate::{Point, PointCloud};
 
-pub const NUM_POINT_CLOUDS: usize = 16;
 pub const NUM_POINTS: usize = 32;
 pub const ORIGIN: Point = Point {
     x: 0.0,
