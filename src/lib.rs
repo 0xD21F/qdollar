@@ -187,23 +187,43 @@ mod tests {
         assert!(scaled_points.iter().all(|pt| pt.x >= 0.0 && pt.x <= 1.0));
         assert!(scaled_points.iter().all(|pt| pt.y >= 0.0 && pt.y <= 1.0));
     }
-
+    
     #[test]
     fn test_utils_translate_to() {
-        let points = vec![
-            Point::new(0.0, 0.0, 1),
-            Point::new(1.0, 0.0, 1),
-            Point::new(1.0, 1.0, 1),
-            Point::new(0.0, 1.0, 1),
-            Point::new(0.0, 0.0, 1),
+        let point_sets = vec![
+            // Square shape
+            vec![
+                Point::new(0.0, 0.0, 1),
+                Point::new(1.0, 0.0, 1),
+                Point::new(1.0, 1.0, 1),
+                Point::new(0.0, 1.0, 1),
+                Point::new(0.0, 0.0, 1),
+            ],
+            // Triangle shape
+            vec![
+                Point::new(0.0, 0.0, 1),
+                Point::new(1.0, 0.0, 1),
+                Point::new(0.5, 1.0, 1),
+                Point::new(0.0, 0.0, 1),
+            ],
+            // Random points
+            vec![
+                Point::new(0.3, 0.7, 1),
+                Point::new(0.1, 0.2, 1),
+                Point::new(0.9, 0.4, 1),
+                Point::new(0.6, 0.8, 1),
+            ],
         ];
-
-        let translated_points = utils::translate_to(&points, &utils::ORIGIN);
-
-        let centroid = utils::centroid(&translated_points);
-        assert!((centroid.x - utils::ORIGIN.x).abs() < 1e-6);
-        assert!((centroid.y - utils::ORIGIN.y).abs() < 1e-6);
-    }
+    
+        let target_point = Point::new(1.0, 1.0, 0);
+    
+        for points in &point_sets {
+            let translated_points = utils::translate_to(points, &target_point);
+            let centroid = utils::centroid(&translated_points);
+            assert!((centroid.x - target_point.x).abs() < 1e-6);
+            assert!((centroid.y - target_point.y).abs() < 1e-6);
+        }
+    }    
 
     fn plot_points(
         points: &[Point],
