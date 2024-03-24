@@ -21,17 +21,17 @@ pub fn resample(points: &[Point], n: usize) -> Vec<Point> {
     let mut points_vec = points.to_vec();
     while i < points_vec.len() {
         if points_vec[i].id == points_vec[i - 1].id {
-            let d = euclidean_distance(&points_vec[i - 1], &points_vec[i]);
-            if dist + d >= interval {
-                let ratio = (interval - dist) / d;
-                let qx = points_vec[i - 1].x + ratio * (points_vec[i].x - points_vec[i - 1].x);
-                let qy = points_vec[i - 1].y + ratio * (points_vec[i].y - points_vec[i - 1].y);
-                let q = Point::new(qx, qy, points_vec[i].id);
-                new_points.push(q);
-                points_vec.insert(i, q);
+            let distance = euclidean_distance(&points_vec[i - 1], &points_vec[i]);
+            if dist + distance >= interval {
+                let ratio = (interval - dist) / distance;
+                let new_x = points_vec[i - 1].x + ratio * (points_vec[i].x - points_vec[i - 1].x);
+                let new_y = points_vec[i - 1].y + ratio * (points_vec[i].y - points_vec[i - 1].y);
+                let new_point = Point::new(new_x, new_y, points_vec[i].id);
+                new_points.push(new_point);
+                points_vec.insert(i, new_point);
                 dist = 0.0;
             } else {
-                dist += d;
+                dist += distance;
             }
         }
         i += 1;
@@ -60,7 +60,7 @@ pub fn scale(points: &[Point]) -> Vec<Point> {
         },
     );
 
-    let size = (max_x - min_x).max(max_y - min_y);
+    let size = (max_x - min_x).max(max_y - min_y) + 1e-6;
 
     points
         .iter()
