@@ -2,11 +2,13 @@ pub mod point;
 pub mod point_cloud;
 pub mod qdollar;
 pub mod utils;
+pub mod error;
 
 pub use point::Point;
 pub use point_cloud::PointCloud;
 pub use qdollar::QDollarRecognizer;
 pub use qdollar::QDollarResult;
+pub use error::QDollarError;
 
 #[cfg(test)]
 mod tests {
@@ -34,26 +36,24 @@ mod tests {
         ];
         recognizer.add_gesture("square".to_string(), square_points.clone());
 
-        let result = recognizer.recognize(&square_points);
+        let result = recognizer.recognize(&square_points).unwrap();
         assert_eq!(result.name, "square");
         assert!(result.score > 0.9);
     }
 
     #[test]
-    fn test_recognize_no_gestures() {
+    fn test_recognize_no_registered_gestures() {
         let recognizer = QDollarRecognizer::new();
-
         let points = vec![
             Point::new(0.0, 0.0, 1),
-            Point::new(0.0, 1.0, 1),
-            Point::new(1.0, 1.0, 1),
             Point::new(1.0, 0.0, 1),
-            Point::new(0.0, 0.0, 1),
+            Point::new(1.0, 1.0, 1),
+            Point::new(0.0, 1.0, 1),
         ];
 
         let result = recognizer.recognize(&points);
-        assert_eq!(result.name, "No gestures registered");
-        assert_eq!(result.score, 0.0);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), QDollarError::NoRegisteredGestures);
     }
 
     #[test]
@@ -77,11 +77,11 @@ mod tests {
         ];
         recognizer.add_gesture("triangle".to_string(), triangle_points.clone());
 
-        let result_square = recognizer.recognize(&square_points);
+        let result_square = recognizer.recognize(&square_points).unwrap();
         assert_eq!(result_square.name, "square");
         assert!(result_square.score > 0.9);
 
-        let result_triangle = recognizer.recognize(&triangle_points);
+        let result_triangle = recognizer.recognize(&triangle_points).unwrap();
         assert_eq!(result_triangle.name, "triangle");
         assert!(result_triangle.score > 0.9);
     }
@@ -187,7 +187,7 @@ mod tests {
         assert!(scaled_points.iter().all(|pt| pt.x >= 0.0 && pt.x <= 1.0));
         assert!(scaled_points.iter().all(|pt| pt.y >= 0.0 && pt.y <= 1.0));
     }
-    
+
     #[test]
     fn test_utils_translate_to() {
         let point_sets = vec![
@@ -277,7 +277,7 @@ mod tests {
         let num_gestures = recognizer.add_gesture("circle".to_string(), circle_points.clone());
         assert_eq!(num_gestures, 1);
 
-        let result = recognizer.recognize(&circle_points);
+        let result = recognizer.recognize(&circle_points).unwrap();
         assert_eq!(result.name, "circle");
         assert!(result.score > 0.9);
 

@@ -1,9 +1,11 @@
 use crate::{utils, Point, PointCloud};
+use crate::error::QDollarError;
 
 pub struct QDollarRecognizer {
     point_clouds: Vec<PointCloud>,
 }
 
+#[derive(Debug)]
 pub struct QDollarResult {
     pub name: String,
     pub score: f64,
@@ -17,17 +19,13 @@ impl QDollarRecognizer {
         }
     }
 
-    pub fn recognize(&self, points: &[Point]) -> QDollarResult {
+    pub fn recognize(&self, points: &[Point]) -> Result<QDollarResult, QDollarError> {
         let now = std::time::Instant::now();
 
         if self.point_clouds.is_empty() {
-            return QDollarResult {
-                name: "No gestures registered".to_string(),
-                score: 0.0,
-                time: now.elapsed().as_millis(),
-            };
+            return Err(QDollarError::NoRegisteredGestures);
         }
-
+    
         let candidate = PointCloud::new(String::new(), points.to_vec());
 
         let mut best_distance = f64::INFINITY;
@@ -47,11 +45,11 @@ impl QDollarRecognizer {
             1.0
         };
 
-        QDollarResult {
+        Ok(QDollarResult {
             name: self.point_clouds[best_template].name.clone(),
             score,
             time: now.elapsed().as_millis(),
-        }
+        })
     }
 
     pub fn add_gesture(&mut self, name: String, points: Vec<Point>) -> usize {
